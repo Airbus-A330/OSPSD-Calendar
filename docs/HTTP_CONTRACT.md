@@ -94,11 +94,11 @@ clients ignore fields they do not recognize. [Rule 15]
 - Responses carry the instants the provider stored, written with any
   equivalent UTC offset. A server does not have to keep the offset the
   request used, so clients compare instants, not timestamp strings.
-- Times are whole seconds, and a server may drop sub-seconds from the times
-  it receives. A server that drops them checks that `end` is after `start`
-  after dropping them, so `10:00:00.1` to `10:00:00.9` is rejected there with
-  `422 invalid_input`. Clients that need the same result from every server
-  send whole seconds.
+- Timestamps may have fractional seconds, and a server may drop them from
+  the times it receives. A server that drops them checks that `end` is after
+  `start` after dropping them, so `10:00:00.1` to `10:00:00.9` is rejected
+  there with `422 invalid_input`. Clients that need the same result from every
+  server send whole seconds.
 
 ## Errors
 
@@ -132,7 +132,7 @@ Every error response has this body:
 | The body is not valid JSON | `400` | `invalid_input` |
 | Valid JSON that breaks a rule: a missing, unknown or wrongly typed field, or a bad value such as a timestamp without an offset or an `end` not after `start` | `422` | `invalid_input` |
 | A bad path or query parameter | `422` | `invalid_input` |
-| Another invalid request that is not a validation failure, such as Team 7 refusing to replace an all-day event | `400` | `invalid_input` |
+| Any other invalid request that is not a validation failure | `400` | `invalid_input` |
 | `GET`, `PUT` or `DELETE` on an id the calendar does not have | `404` | `not_found` |
 | A `DELETE` repeated after it succeeded | `404` | `not_found` |
 | The configured provider identity lacks permission for the operation | `403` | `access_denied` |
@@ -143,8 +143,8 @@ Every error response has this body:
 - These five codes are shared. A server uses another code only for a case
   this contract does not cover, such as `internal_error` for a `500`.
   [Rule 12]
-- A `503` includes a `Retry-After` header when there is a meaningful wait.
-  [Rule 9]
+- A `503` may include a `Retry-After` header when there is a meaningful
+  retry delay. [Rule 9]
 - A create or replace whose outcome is unknown always has
   `"retryable": false`, even when the response also has `Retry-After`. The
   server never retries the write on its own, because sending it again may

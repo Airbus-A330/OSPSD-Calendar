@@ -51,20 +51,21 @@ configuration, and provider-specific adapters.
 
 ## Installing in a service
 
-Add a release tag to your service's dependencies with uv:
+Add a release tag to your service's dependencies with uv, replacing
+`<release-tag>` with the newest tag on the repository's Releases page:
 
 ```bash
-uv add "git+https://github.com/Airbus-A330/OSPSD-Calendar" --tag v0.1.0
+uv add "git+https://github.com/Airbus-A330/OSPSD-Calendar" --tag <release-tag>
 ```
 
 Or with pip:
 
 ```bash
-pip install "calendar-contract @ git+https://github.com/Airbus-A330/OSPSD-Calendar@v0.1.0"
+pip install "calendar-contract @ git+https://github.com/Airbus-A330/OSPSD-Calendar@<release-tag>"
 ```
 
-Use the newest tag on the repository's Releases page. The package ships a
-`py.typed` marker, so `mypy --strict` checks your code against its types.
+The package ships a `py.typed` marker, so `mypy --strict` checks your code
+against its types.
 
 ## Versions
 
