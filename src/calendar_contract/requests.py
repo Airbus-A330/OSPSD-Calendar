@@ -11,7 +11,7 @@ from calendar_contract.title import validate_write_title
 class CreateEvent(BaseModel):
     """Values supplied when creating an event with a provider-assigned ID."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
 
     title: str
     start: str
@@ -28,7 +28,7 @@ class CreateEvent(BaseModel):
 class ReplaceEvent(BaseModel):
     """Complete writable values used to replace an existing event."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
 
     title: str
     start: str
