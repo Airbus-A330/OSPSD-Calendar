@@ -20,6 +20,3 @@ dist/
 .vscode/
 .DS_Store
 Thumbs.db
-
-# Local assignment material
-Instructions.pdf
