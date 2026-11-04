@@ -132,7 +132,6 @@ Every error response has this body:
 | The body is not valid JSON | `400` | `invalid_input` |
 | Valid JSON that breaks a rule: a missing, unknown or wrongly typed field, or a bad value such as a timestamp without an offset or an `end` not after `start` | `422` | `invalid_input` |
 | A bad path or query parameter | `422` | `invalid_input` |
-| Any other invalid request that is not a validation failure | `400` | `invalid_input` |
 | `GET`, `PUT` or `DELETE` on an id the calendar does not have | `404` | `not_found` |
 | A `DELETE` repeated after it succeeded | `404` | `not_found` |
 | The configured provider identity lacks permission for the operation | `403` | `access_denied` |
