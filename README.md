@@ -65,6 +65,9 @@ Use Python 3.12 and [uv](https://docs.astral.sh/uv/) from the repository root:
 uv sync --locked
 ```
 
+The package supports Python 3.12 and newer. CI runs the checks below on
+Python 3.12, 3.13 and 3.14.
+
 ## Checks
 
 ```bash

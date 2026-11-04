@@ -37,7 +37,8 @@ tests and documentation together.
 
 ## Development Expectations
 
-- Use Python 3.12 and `uv`; do not add `requirements.txt`.
+- Develop on Python 3.12, the oldest supported version, with `uv`; do not add
+  `requirements.txt`. CI also runs the checks on Python 3.13 and 3.14.
 - Keep pull requests focused and easy to review.
 - Keep public APIs typed.
 - Add or update focused tests when behavior changes.
