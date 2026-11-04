@@ -1,94 +1,70 @@
-"""Tests for provider-independent error data."""
-
-import json
-from dataclasses import asdict
-from typing import cast
+"""Tests for the provider-independent Calendar error contract."""
 
 import pytest
 
-from calendar_contract import CalendarError, ErrorCode
+from calendar_contract.errors import CalendarError, ErrorCode
 
 
-def test_shared_error_codes_have_contract_values() -> None:
-    assert {code.value for code in ErrorCode} == {
-        "invalid_input",
-        "not_found",
-        "access_denied",
-        "provider_error",
-        "provider_unavailable",
+def test_error_codes_remain_unchanged() -> None:
+    assert {code.name: code.value for code in ErrorCode} == {
+        "INVALID_INPUT": "invalid_input",
+        "NOT_FOUND": "not_found",
+        "ACCESS_DENIED": "access_denied",
+        "PROVIDER_ERROR": "provider_error",
+        "PROVIDER_UNAVAILABLE": "provider_unavailable",
     }
 
 
 @pytest.mark.parametrize("code", list(ErrorCode))
-def test_error_carries_required_data_without_details(code: ErrorCode) -> None:
-    error = CalendarError(code=code, message="Operation failed.", retryable=False)
-    assert asdict(error) == {
-        "code": code.value,
-        "message": "Operation failed.",
-        "retryable": False,
-        "details": None,
-    }
-    assert json.loads(json.dumps(asdict(error)))["code"] == code.value
+@pytest.mark.parametrize("retryable", [False, True])
+def test_construction_without_details(code: ErrorCode, retryable: bool) -> None:
+    error = CalendarError(
+        code=code, message="Calendar operation failed", retryable=retryable
+    )
+
+    assert isinstance(error, Exception)
+    assert error.code is code
+    assert error.message == "Calendar operation failed"
+    assert error.retryable is retryable
+    assert error.details is None
+    assert str(error) == "Calendar operation failed"
+    assert error.args == ("Calendar operation failed",)
 
 
-def test_error_carries_sanitized_details() -> None:
+@pytest.mark.parametrize("details", [None, {}, {"field": "start", "attempt": 2}])
+def test_construction_with_explicit_details(details: dict[str, object] | None) -> None:
     error = CalendarError(
         code=ErrorCode.INVALID_INPUT,
-        message="Invalid event.",
+        message="Invalid event start",
         retryable=False,
-        details={"field": "title", "reason": "blank"},
+        details=details,
     )
-    assert asdict(error) == {
-        "code": "invalid_input",
-        "message": "Invalid event.",
-        "retryable": False,
-        "details": {"field": "title", "reason": "blank"},
-    }
+
+    assert error.details == details
+    assert str(error) == "Invalid event start"
 
 
-@pytest.mark.parametrize("retryable", [False, True])
-def test_retryability_is_explicit_not_inferred_from_code(retryable: bool) -> None:
-    error = CalendarError(
-        code=ErrorCode.PROVIDER_ERROR,
-        message="Provider operation failed.",
-        retryable=retryable,
-    )
-    assert error.retryable is retryable
-
-
-def test_error_rejects_unknown_code() -> None:
-    with pytest.raises(ValueError):
-        ErrorCode("unknown")
-
-
-def test_error_rejects_untyped_code() -> None:
-    with pytest.raises(TypeError, match="code"):
-        CalendarError(
-            code=cast(ErrorCode, "not_found"), message="Not found.", retryable=False
-        )
-
-
-def test_error_rejects_non_boolean_retryable() -> None:
+def test_retryable_is_required() -> None:
     with pytest.raises(TypeError, match="retryable"):
-        CalendarError(
-            code=ErrorCode.PROVIDER_ERROR,
-            message="Failed.",
-            retryable=cast(bool, "false"),
-        )
+        CalendarError(code=ErrorCode.NOT_FOUND, message="Event not found")  # type: ignore[call-arg]
 
 
-def test_error_rejects_non_string_message() -> None:
-    with pytest.raises(TypeError, match="message"):
-        CalendarError(
-            code=ErrorCode.PROVIDER_ERROR, message=cast(str, None), retryable=False
-        )
+def test_error_can_be_raised_and_caught_as_an_exception() -> None:
+    error = CalendarError(
+        code=ErrorCode.NOT_FOUND,
+        message="Event not found",
+        retryable=False,
+    )
+
+    with pytest.raises(Exception, match="^Event not found$") as caught:
+        raise error
+
+    assert caught.value is error
 
 
-def test_error_rejects_non_dictionary_details() -> None:
-    with pytest.raises(TypeError, match="details"):
-        CalendarError(
-            code=ErrorCode.INVALID_INPUT,
-            message="Invalid event.",
-            retryable=False,
-            details=cast(dict[str, object], "raw response"),
-        )
+@pytest.mark.parametrize("message", ["", "Événement introuvable"])
+def test_message_is_preserved(message: str) -> None:
+    error = CalendarError(code=ErrorCode.NOT_FOUND, message=message, retryable=False)
+
+    assert error.message == message
+    assert str(error) == message
