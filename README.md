@@ -30,6 +30,14 @@ end
 Detailed behavior is governed by the shared Calendar decision memo. Code and
 documentation in this repository will implement that approved agreement.
 
+## Python interface draft
+
+`CalendarService` defines the four synchronous operations using the shared
+models and errors. See [the interface draft](docs/PYTHON_INTERFACE.md) for
+imports, failure semantics, consumer usage, and conformance integration.
+The signatures match the proposal in conformance PR #14 and await cross-team
+review.
+
 ## Optional Extensions
 
 Listing, PATCH, all-day events, richer event fields, and calendar metadata are
