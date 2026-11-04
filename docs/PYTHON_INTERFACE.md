@@ -76,30 +76,52 @@ implementation-specific sub-second handling.
 ## Conformance integration and remaining review
 
 The suite imports this exact protocol from `calendar_contract.service`.
-Subclass `CalendarServiceConformance` in a test module and provide a fresh,
-isolated `service` fixture returning your implementation:
+Subclass `CalendarServiceConformance` in a test module and provide two
+fixtures: a fresh, isolated `service` returning your implementation, and
+`failing_service`, a factory that takes a `ProviderFailure` and returns your
+implementation on a controlled provider that fails every call that way:
 
 ```python
 import pytest
 
 from calendar_contract import CalendarService
-from calendar_contract.conformance import CalendarServiceConformance
+from calendar_contract.conformance import (
+    CalendarServiceConformance,
+    FailingServiceFactory,
+)
 
 
 class TestCalendar(CalendarServiceConformance):
     @pytest.fixture
     def service(self) -> CalendarService:
         return make_isolated_service()  # Supplied by the service's tests.
+
+    @pytest.fixture
+    def failing_service(self) -> FailingServiceFactory:
+        return make_failing_service  # Takes a ProviderFailure.
 ```
+
+`ProviderFailure` has four members, and the suite checks each translation:
+
+| Failure | Operations | Expected `CalendarError` |
+| --- | --- | --- |
+| `ACCESS_DENIED` | all four | `access_denied`, `retryable` is a bool |
+| `UNEXPECTED_RESPONSE` | all four | `provider_error`, `retryable` is a bool |
+| `UNAVAILABLE` | all four | `provider_unavailable`, `retryable` is a bool |
+| `UNCERTAIN_WRITE` | create, replace | `provider_error`, `retryable` is `False` |
+
+The contract fixes `retryable` only for uncertain writes, so the suite checks
+only its type for the other failures. It also checks that `CreateEvent` and
+`ReplaceEvent` reject representative invalid input (an unknown field, a missing
+shared field) with `pydantic.ValidationError`.
 
 Install pytest in the consuming test environment. Importing the public package
 or service interface does not import the pytest-based suite. Offline checks
 must use controlled providers without credentials or network access. Passing
 against the suite's in-memory service does not establish Google integration.
 
-Agree on controlled failure hooks with the conformance owner before extending
-the suite to access denial, temporary failures, and uncertain writes. Do not
-add test-control methods to the four-operation production protocol.
+The failure hooks live only in test fixtures. Do not add test-control methods
+to the four-operation production protocol.
 
 Review the public names, synchronous signatures, and validation/error boundary
 with Kristie and Teams 2/7 before merging. Team 2's unfinished model/validation
