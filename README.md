@@ -30,6 +30,12 @@ end
 The full HTTP behavior is in [`docs/HTTP_CONTRACT.md`](docs/HTTP_CONTRACT.md).
 The shared Calendar decision memo keeps the reasoning behind each rule.
 
+## Python Interface
+
+`CalendarService` defines the four synchronous operations using the shared
+models and errors. See [the Python interface](docs/PYTHON_INTERFACE.md) for
+imports, failure semantics, consumer usage, and conformance integration.
+
 ## Optional Extensions
 
 Listing, PATCH, all-day events, richer event fields, and calendar metadata are
