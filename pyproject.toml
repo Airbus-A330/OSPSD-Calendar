@@ -7,7 +7,7 @@ name = "calendar-contract"
 version = "0.1.0"
 description = "Provider-independent shared Calendar contract for OSPSD Teams 2, 5, and 7."
 readme = "README.md"
-requires-python = ">=3.12,<3.13"
+requires-python = ">=3.12"
 dependencies = []
 
 [dependency-groups]
