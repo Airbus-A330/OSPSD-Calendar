@@ -1,8 +1,7 @@
-# Calendar Python interface draft
+# Calendar Python Interface
 
-This is the interface portion of shared issue #2, based on the shape used by
-[conformance PR #14](https://github.com/Airbus-A330/OSPSD-Calendar/pull/14).
-The public names and synchronous signatures remain subject to cross-team review.
+This document defines the provider-independent Python interface and reusable
+conformance API shared by Teams 2, 5, and 7.
 
 ## Public API
 
@@ -73,7 +72,7 @@ The caller owns cleanup for events it creates. Timestamp comparisons use
 instants; equivalent output offsets are allowed. Whole-second inputs avoid
 implementation-specific sub-second handling.
 
-## Conformance integration and remaining review
+## Conformance integration
 
 The suite imports this exact protocol from `calendar_contract.service`.
 Subclass `CalendarServiceConformance` in a test module and provide two
@@ -122,11 +121,3 @@ against the suite's in-memory service does not establish Google integration.
 
 The failure hooks live only in test fixtures. Do not add test-control methods
 to the four-operation production protocol.
-
-Review the public names, synchronous signatures, and validation/error boundary
-with Kristie and Teams 2/7 before merging. Team 2's unfinished model/validation
-work remains a release dependency. Full shared conformance and a tagged package
-are not established by this interface draft.
-
-Codex assisted with this draft and its checks; contributors must verify and
-understand the submitted work.

@@ -1,5 +1,7 @@
 """Shared, provider-independent Calendar contract package."""
 
+from importlib.metadata import version
+
 from calendar_contract.errors import CalendarError, ErrorCode
 from calendar_contract.event import Event
 from calendar_contract.requests import CreateEvent, ReplaceEvent
@@ -14,4 +16,4 @@ __all__ = [
     "ReplaceEvent",
 ]
 
-__version__ = "0.1.0"
+__version__ = version("calendar-contract")
