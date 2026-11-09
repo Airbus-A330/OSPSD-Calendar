@@ -177,3 +177,6 @@ deleted its event remains safe. Implementations should still give each test an
 isolated calendar or controlled provider where practical. The normal suite is
 credential-free and network-free; real-provider verification remains the
 responsibility of each service repository.
+
+Recorded cross-team executions and implementation findings are kept in
+[`CONFORMANCE_RESULTS.md`](CONFORMANCE_RESULTS.md).
