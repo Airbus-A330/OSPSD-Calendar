@@ -1,4 +1,4 @@
-# Shared Calendar HTTP MS2 Contract
+# Shared Calendar HTTP Contract
 
 ## Status
 
