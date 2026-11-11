@@ -12,7 +12,7 @@ release candidate commit ([`RELEASING.md`](RELEASING.md)). Update this table wit
 | Team | Latest recorded run | Python suite | HTTP suite | Passing? |
 | --- | --- | --- | --- | --- |
 | Team 2 | Nov 11, service `5f25ac8`, suite `fd4a056` | 46 passed | 55 passed | Yes ([final rerun](#team-2-final-rerun)) |
-| Team 5 | none | not recorded | not recorded | Not yet recorded |
+| Team 5 | Nov 11, service `7859542`, suite `afd62a6` | 24 passed | 55 passed | Yes ([Team 5 verification](#team-5-verification)) |
 | Team 7 | Nov 11, suite `fd4a056` | 37 passed | 55 passed | Conditional: local run passed; rerun required after the service PRs merge |
 
 ## Team 2 final rerun
@@ -81,6 +81,16 @@ time ordering, unknown fields, malformed JSON, and controlled provider
 outcomes. Team 2 should correct its HTTP error translation and then run the
 same suite in its service repository. No shared assertions were relaxed in
 response to these findings.
+
+## Team 5 verification
+
+Tested on November 11, 2026, with Python 3.14.8.
+
+- Service: `juno-junhyuk-lee/OSPSD-Team-5`, tag `v0.1.0-beta.6`, commit `7859542c83f8a051d4d287f811a7f27bd1150e9e`.
+- Shared package and suites: `Airbus-A330/OSPSD-Calendar`, commit `afd62a60889f4d668945e40c105307277961cd21` on `ms3-submission`. Both suite files were unchanged from `fd4a056`.
+- Python suite: `CalendarServiceConformance` exercised Team 5's `GoogleCalendarService` directly. Normal cases used Team 5's Google adapters with a fake Google SDK. Failure cases used Team 5's controlled failing adapters. Result: 24 passed, 0 failed, 0 skipped.
+- HTTP suite: `CalendarHttpConformance` exercised Team 5's FastAPI routes through `TestClient`, including request validation, CRUD, the consumer workflow, and HTTP error translation. Failure cases supplied a `GoogleCalendarService` backed by controlled failing adapters. Result: 55 passed, 0 failed, 0 skipped.
+- The run used temporary pytest fixture wiring with the shared assertions unchanged. Neither suite required Google credentials or made live Calendar calls. The separate [deployed workflow and cleanup verification](https://github.com/juno-junhyuk-lee/OSPSD-Team-5/pull/51#issuecomment-6807853904) covers the real Google Calendar path.
 
 ## Team 7
 
