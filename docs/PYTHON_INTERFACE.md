@@ -36,13 +36,13 @@ repeated delete, raise a non-retryable `NOT_FOUND` error.
 
 Operation failures use `CalendarError(code, message, retryable, details=None)`:
 
-| ErrorCode | Meaning |
-| --- | --- |
-| `INVALID_INPUT` | A request cannot be accepted under the shared rules. |
-| `NOT_FOUND` | The requested event is missing or deleted. |
-| `ACCESS_DENIED` | The configured provider identity lacks permission. |
-| `PROVIDER_ERROR` | An unexpected provider response or uncertain create/replace. |
-| `PROVIDER_UNAVAILABLE` | Temporary provider unavailability. |
+| ErrorCode              | Meaning                                                      |
+| ---------------------- | ------------------------------------------------------------ |
+| `INVALID_INPUT`        | A request cannot be accepted under the shared rules.         |
+| `NOT_FOUND`            | The requested event is missing or deleted.                   |
+| `ACCESS_DENIED`        | The configured provider identity lacks permission.           |
+| `PROVIDER_ERROR`       | An unexpected provider response or uncertain create/replace. |
+| `PROVIDER_UNAVAILABLE` | Temporary provider unavailability.                           |
 
 An uncertain create/replace uses `PROVIDER_ERROR` and `retryable=False`; the
 implementation never automatically retries it. Sanitize messages and optional
@@ -105,12 +105,12 @@ class TestCalendar(CalendarServiceConformance):
 
 `ProviderFailure` has four members, and the suite checks each translation:
 
-| Failure | Operations | Expected `CalendarError` |
-| --- | --- | --- |
-| `ACCESS_DENIED` | all four | `access_denied`, `retryable` is a bool |
-| `UNEXPECTED_RESPONSE` | all four | `provider_error`, `retryable` is a bool |
-| `UNAVAILABLE` | all four | `provider_unavailable`, `retryable` is a bool |
-| `UNCERTAIN_WRITE` | create, replace | `provider_error`, `retryable` is `False` |
+| Failure               | Operations      | Expected `CalendarError`                      |
+| --------------------- | --------------- | --------------------------------------------- |
+| `ACCESS_DENIED`       | all four        | `access_denied`, `retryable` is a bool        |
+| `UNEXPECTED_RESPONSE` | all four        | `provider_error`, `retryable` is a bool       |
+| `UNAVAILABLE`         | all four        | `provider_unavailable`, `retryable` is a bool |
+| `UNCERTAIN_WRITE`     | create, replace | `provider_error`, `retryable` is `False`      |
 
 The contract fixes `retryable` only for uncertain writes, so the suite checks
 only its type for the other failures. It also checks that `CreateEvent` and

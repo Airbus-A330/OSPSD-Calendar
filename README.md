@@ -61,10 +61,10 @@ configuration, and provider-specific adapters.
 Every implementation in the vertical runs the same two suites from this package, from its
 own repository, against its own code:
 
-| Suite | Checks | How to run it |
-| --- | --- | --- |
-| `calendar_contract.conformance.CalendarServiceConformance` | The Python interface: the four operations and the five shared errors | [Python service conformance](docs/PYTHON_INTERFACE.md#python-service-conformance) |
-| `calendar_contract.http_conformance.CalendarHttpConformance` | The HTTP contract: statuses, error bodies, validation, failures and the common consumer workflow | [HTTP conformance](docs/PYTHON_INTERFACE.md#http-conformance) |
+| Suite                                                        | Checks                                                                                           | How to run it                                                                     |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| `calendar_contract.conformance.CalendarServiceConformance`   | The Python interface: the four operations and the five shared errors                             | [Python service conformance](docs/PYTHON_INTERFACE.md#python-service-conformance) |
+| `calendar_contract.http_conformance.CalendarHttpConformance` | The HTTP contract: statuses, error bodies, validation, failures and the common consumer workflow | [HTTP conformance](docs/PYTHON_INTERFACE.md#http-conformance)                     |
 
 Each suite is a pytest class: subclass it and supply the fixtures that return your
 implementation and its controlled failing variants. Tests track IDs returned by successful

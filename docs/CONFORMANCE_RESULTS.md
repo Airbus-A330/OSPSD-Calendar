@@ -4,16 +4,16 @@ This file records cross-team runs of the reusable shared conformance suite.
 Failures are implementation findings; they do not change or weaken the shared
 contract.
 
-## Status before the stable release
+## v0.1.0 conformance status
 
-The stable tag waits until every team has a recorded passing run of both suites at the
-release candidate commit ([`RELEASING.md`](RELEASING.md)). Update this table with each run.
+All three teams recorded passing runs of both shared suites for the v0.1.0
+release ([`RELEASING.md`](RELEASING.md)).
 
-| Team | Latest recorded run | Python suite | HTTP suite | Passing? |
-| --- | --- | --- | --- | --- |
-| Team 2 | Nov 11, service `5f25ac8`, suite `fd4a056` | 46 passed | 55 passed | Yes ([final rerun](#team-2-final-rerun)) |
-| Team 5 | Nov 11, service `7859542`, suite `afd62a6` | 24 passed | 55 passed | Yes ([Team 5 verification](#team-5-verification)) |
-| Team 7 | Nov 11, service `9c068e7`, suite `a00fe8a` | 37 passed | 55 passed | Yes ([final rerun](#team-7-final-rerun)) |
+| Team   | Latest recorded run                        | Python suite | HTTP suite | Passing?                                          |
+| ------ | ------------------------------------------ | ------------ | ---------- | ------------------------------------------------- |
+| Team 2 | Nov 11, service `5f25ac8`, suite `fd4a056` | 46 passed    | 55 passed  | Yes ([final rerun](#team-2-final-rerun))          |
+| Team 5 | Nov 11, service `7859542`, suite `afd62a6` | 24 passed    | 55 passed  | Yes ([Team 5 verification](#team-5-verification)) |
+| Team 7 | Nov 11, service `9c068e7`, suite `a00fe8a` | 37 passed    | 55 passed  | Yes ([final rerun](#team-7-final-rerun))          |
 
 ## Team 2 final rerun
 
@@ -47,9 +47,9 @@ include `retryable`, and provider permission failures use
 `403 access_denied`. No shared assertions were weakened.
 
 The suite source was loaded from the final shared revision for this
-verification because Team 2 remains pinned to `v0.1.0-rc.1` until the stable
-shared tag is published. Team 2 will update its dependency pin and lockfile
-after that tag is available.
+verification because the recorded Team 2 service revision used
+`v0.1.0-rc.1`. The final suite preserves the same service interface and adds
+the completed HTTP conformance coverage shipped in v0.1.0.
 
 ## Team 2 earlier integration run
 
@@ -78,9 +78,9 @@ workflow. The failures fell into these contract-level groups:
 The repeated parameterized failures are multiple examples of these same
 behaviors, including required and null fields, title rules, timestamp syntax,
 time ordering, unknown fields, malformed JSON, and controlled provider
-outcomes. Team 2 should correct its HTTP error translation and then run the
-same suite in its service repository. No shared assertions were relaxed in
-response to these findings.
+outcomes. Team 2 corrected its HTTP error translation and passed the final
+rerun recorded above. No shared assertions were relaxed in response to these
+findings.
 
 ## Team 5 verification
 
@@ -112,7 +112,8 @@ Against the real Google Calendar, on the same revision: BASK'D's CI integration 
 Python suite's create, get, replace and delete checks through its Google provider
 ([run 43108298662](https://github.com/samthropic/BASKD/actions/runs/43108298662/job/130817519994)):
 10 passed, 14 skipped (the failure checks, which a real calendar cannot produce on demand).
-Until the stable tag exists that job uses BASK'D's pinned suite, `v0.1.0-rc.1`.
+That real-provider job used BASK'D's then-pinned suite, `v0.1.0-rc.1`; the
+final controlled conformance run above used shared revision `a00fe8a`.
 
 ## Team 7 earlier local run
 
@@ -137,7 +138,7 @@ through BASK'D's Google provider. It ran in BASK'D's CI at `aadd50c` (that PR's 
 Nov 4, with suite `v0.1.0-rc.1`), in the integration job of
 [run 41888897047](https://github.com/samthropic/BASKD/actions/runs/41888897047/job/126780897225):
 16 passed and 14 skipped (the failure checks, which a real calendar cannot produce on
-demand). It has not been rerun against suite `fd4a056`.
+demand). The final rerun above subsequently passed the completed suites at `a00fe8a`.
 
 Before those three PRs, the HTTP suite found two gaps on BASK'D's `main`: malformed JSON
 returned `422` instead of `400`, and an access denial returned `502` instead of

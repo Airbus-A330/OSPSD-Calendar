@@ -1,16 +1,16 @@
 # Release notes
 
-## v0.1.0 (proposed, not yet tagged)
+## v0.1.0
 
-**Status:** draft. Tag it only once every team's row in
-[`CONFORMANCE_RESULTS.md`](CONFORMANCE_RESULTS.md) says it passes, following
-[`RELEASING.md`](RELEASING.md). The tag points at the reviewed, green merge commit on
-`master` and is never moved.
+**Status:** Final stable release. All three teams passed both shared
+conformance suites, as recorded in
+[`CONFORMANCE_RESULTS.md`](CONFORMANCE_RESULTS.md). The immutable `v0.1.0` tag
+identifies the reviewed, green release commit on `ms3-submission`.
 
 **Why `v0.1.0`.** It is the stable release of `v0.1.0-rc.1`. The package metadata already
 says `0.1.0`, and nothing since `rc.1` changes contract semantics: no rule, model, error code
-or `CalendarService` signature changed. So by `RELEASING.md` it is not a minor bump. If a
-contract change lands before the tag, the release becomes `v0.2.0` instead.
+or `CalendarService` signature changed. Under `RELEASING.md`, no minor version bump is
+required.
 
 **Changes since `v0.1.0-rc.1`:**
 
@@ -30,6 +30,3 @@ contract change lands before the tag, the release becomes `v0.2.0` instead.
 **Known limitation (unchanged):** a create that times out returns no `id`, and listing is
 not shared, so the shared core gives a client no way to check whether the event was created
 before sending the request again (`HTTP_CONTRACT.md`, "Known limitation").
-
-**Note on tag names:** the release candidate was tagged `v0.1.0-rc.1`, but `RELEASING.md`
-writes release candidates as `v0.2.0rc1`. Pick one form for future candidates.

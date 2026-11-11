@@ -34,11 +34,12 @@ new version.
 2. **Get it reviewed.** The release PR needs one approval from each of Teams
    2, 5 and 7, none of them from its author, and CI must pass. Every team's
    service will depend on the release, so every team signs off on it.
-3. **Merge it**, and wait for CI to pass on the merge commit on `master`.
-4. **Tag that commit and push the tag:**
+3. **Merge it**, and wait for CI to pass on the designated release branch. For
+   v0.1.0, the reviewed release branch is `ms3-submission`.
+4. **Tag that exact commit and push the tag:**
 
    ```bash
-   git switch master
+   git switch ms3-submission
    git pull --ff-only
    git tag -a v0.1.0 -m "v0.1.0"
    git push origin v0.1.0
