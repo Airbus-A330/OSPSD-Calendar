@@ -8,6 +8,9 @@ conformance API shared by Teams 2, 5, and 7.
 Import `CalendarService`, `Event`, `CreateEvent`, `ReplaceEvent`, `CalendarError`,
 and `ErrorCode` from `calendar_contract`. Module imports such as
 `calendar_contract.service.CalendarService` remain supported.
+Those six names are the package root's explicit `__all__`; helper modules used
+to implement validation are not part of the supported root API.
+`calendar_contract.__version__` exposes the installed package version.
 
 ```python
 class CalendarService(Protocol):
