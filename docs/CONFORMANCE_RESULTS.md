@@ -11,11 +11,47 @@ release candidate commit ([`RELEASING.md`](RELEASING.md)). Update this table wit
 
 | Team | Latest recorded run | Python suite | HTTP suite | Passing? |
 | --- | --- | --- | --- | --- |
-| Team 2 | Nov 9, suite `be8ae2b` | not recorded | 9 passed, 46 failed | No: fixes pending, rerun needed |
+| Team 2 | Nov 11, service `5f25ac8`, suite `fd4a056` | 46 passed | 55 passed | Yes ([final rerun](#team-2-final-rerun)) |
 | Team 5 | none | not recorded | not recorded | Not yet recorded |
 | Team 7 | Nov 11, suite `fd4a056` | 37 passed | 55 passed | Conditional: local run passed; rerun required after the service PRs merge |
 
-## Team 2
+## Team 2 final rerun
+
+Tested on November 11, 2026:
+
+- service repository: `Airbus-A330/OSPSD-Team-2`;
+- service revision:
+  `5f25ac82825b99af661b834615c84f1f174ef4fb`;
+- shared suite revision:
+  `fd4a056`;
+- Python execution boundary: Team 2's `CalendarServiceAdapter` was tested
+  directly and through its HTTP-backed adapter, using the shared
+  `CalendarServiceConformance` suite;
+- HTTP execution boundary: Team 2's FastAPI application was exercised through
+  `TestClient` using the shared `CalendarHttpConformance` suite;
+- provider boundary: Team 2's real `GoogleCalendarProvider`, application
+  adapter, cache and HTTP dependency path were used over a controlled fake
+  Google SDK;
+- credentials and network access: not used;
+- result: Python suite 46 passed; HTTP suite 55 passed.
+
+The Python count includes the inherited suite at both Team 2 application
+boundaries. The HTTP count is the complete shared HTTP suite. The run covered
+the four shared operations, validation, missing events, repeated deletion,
+shared error responses, provider failures, uncertain writes and the common
+consumer workflow.
+
+The three failure groups recorded in Team 2's November 9 run are resolved:
+valid contract violations now return `422 invalid_input`, error responses
+include `retryable`, and provider permission failures use
+`403 access_denied`. No shared assertions were weakened.
+
+The suite source was loaded from the final shared revision for this
+verification because Team 2 remains pinned to `v0.1.0-rc.1` until the stable
+shared tag is published. Team 2 will update its dependency pin and lockfile
+after that tag is available.
+
+## Team 2 earlier integration run
 
 Tested on November 9, 2026:
 
