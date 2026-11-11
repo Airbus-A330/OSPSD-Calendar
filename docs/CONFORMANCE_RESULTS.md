@@ -13,7 +13,7 @@ release candidate commit ([`RELEASING.md`](RELEASING.md)). Update this table wit
 | --- | --- | --- | --- | --- |
 | Team 2 | Nov 11, service `5f25ac8`, suite `fd4a056` | 46 passed | 55 passed | Yes ([final rerun](#team-2-final-rerun)) |
 | Team 5 | Nov 11, service `7859542`, suite `afd62a6` | 24 passed | 55 passed | Yes ([Team 5 verification](#team-5-verification)) |
-| Team 7 | Nov 11, suite `fd4a056` | 37 passed | 55 passed | Conditional: local run passed; rerun required after the service PRs merge |
+| Team 7 | Nov 11, service `9c068e7`, suite `a00fe8a` | 37 passed | 55 passed | Yes ([final rerun](#team-7-final-rerun)) |
 
 ## Team 2 final rerun
 
@@ -92,7 +92,29 @@ Tested on November 11, 2026, with Python 3.14.8.
 - HTTP suite: `CalendarHttpConformance` exercised Team 5's FastAPI routes through `TestClient`, including request validation, CRUD, the consumer workflow, and HTTP error translation. Failure cases supplied a `GoogleCalendarService` backed by controlled failing adapters. Result: 55 passed, 0 failed, 0 skipped.
 - The run used temporary pytest fixture wiring with the shared assertions unchanged. Neither suite required Google credentials or made live Calendar calls. The separate [deployed workflow and cleanup verification](https://github.com/juno-junhyuk-lee/OSPSD-Team-5/pull/51#issuecomment-6807853904) covers the real Google Calendar path.
 
-## Team 7
+## Team 7 final rerun
+
+Tested on November 11, 2026, by Karthik Ganeshan, after every BASK'D pull request the earlier
+run depended on had merged:
+
+- service repository: [samthropic/BASKD](https://github.com/samthropic/BASKD);
+- service revision: `main` at `9c068e7068e3708485b9068fda9956e47a48bcfd`, which contains
+  samthropic/BASKD#38, samthropic/BASKD#54 and samthropic/BASKD#56 as merged commits;
+- shared suite revision: `a00fe8a` (`ms3-submission`). The two suite files are unchanged from
+  `fd4a056`;
+- execution boundary: the same as the earlier run below. Success and validation checks use
+  BASK'D's in-memory provider through `TestClient`; failure checks use its real Google
+  Calendar adapter over a fake Google SDK;
+- credentials and network access: not used for these two suites;
+- result: Python suite 37 passed; HTTP suite 55 passed.
+
+Against the real Google Calendar, on the same revision: BASK'D's CI integration job ran the
+Python suite's create, get, replace and delete checks through its Google provider
+([run 43108298662](https://github.com/samthropic/BASKD/actions/runs/43108298662/job/130817519994)):
+10 passed, 14 skipped (the failure checks, which a real calendar cannot produce on demand).
+Until the stable tag exists that job uses BASK'D's pinned suite, `v0.1.0-rc.1`.
+
+## Team 7 earlier local run
 
 Tested on November 11, 2026, by Karthik Ganeshan:
 
