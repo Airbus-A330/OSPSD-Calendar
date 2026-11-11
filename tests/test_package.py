@@ -1,7 +1,20 @@
-"""Smoke tests for the initial package scaffold."""
+"""Smoke tests for the installed package surface."""
+
+from importlib.resources import files
 
 import calendar_contract
-from calendar_contract import errors, event, requests, timestamps, title
+
+
+def test_package_declares_only_intentional_root_exports() -> None:
+    assert calendar_contract.__all__ == [
+        "CalendarError",
+        "CalendarService",
+        "CreateEvent",
+        "ErrorCode",
+        "Event",
+        "ReplaceEvent",
+    ]
+    assert not hasattr(calendar_contract, "version")
 
 
 def test_package_is_importable_with_initial_version() -> None:
@@ -9,18 +22,5 @@ def test_package_is_importable_with_initial_version() -> None:
     assert calendar_contract.__version__ == "0.1.0"
 
 
-def test_team_2_scaffold_modules_are_importable() -> None:
-    """Confirm each parallel Team 2 work area has a stable module boundary."""
-    assert (
-        title.__name__,
-        timestamps.__name__,
-        errors.__name__,
-        event.__name__,
-        requests.__name__,
-    ) == (
-        "calendar_contract.title",
-        "calendar_contract.timestamps",
-        "calendar_contract.errors",
-        "calendar_contract.event",
-        "calendar_contract.requests",
-    )
+def test_typed_package_marker_is_installed() -> None:
+    assert files(calendar_contract).joinpath("py.typed").is_file()

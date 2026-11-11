@@ -14,12 +14,12 @@ review by all three teams (see `AGENTS.md`).
 
 ## Operations
 
-| Operation | Request | Success | Response body |
-| --- | --- | --- | --- |
-| Create | `POST /events` | `201 Created` | the created event |
-| Get by id | `GET /events/{event_id}` | `200 OK` | the event |
-| Replace | `PUT /events/{event_id}` | `200 OK` | the replaced event |
-| Delete | `DELETE /events/{event_id}` | `204 No Content` | none |
+| Operation | Request                     | Success          | Response body      |
+| --------- | --------------------------- | ---------------- | ------------------ |
+| Create    | `POST /events`              | `201 Created`    | the created event  |
+| Get by id | `GET /events/{event_id}`    | `200 OK`         | the event          |
+| Replace   | `PUT /events/{event_id}`    | `200 OK`         | the replaced event |
+| Delete    | `DELETE /events/{event_id}` | `204 No Content` | none               |
 
 [Rules 8, 15]
 
@@ -39,12 +39,12 @@ Create, get and replace return the event as a JSON object:
 }
 ```
 
-| Field | Type | Meaning |
-| --- | --- | --- |
-| `id` | string | Assigned by the provider. Treat it as an opaque string. |
-| `title` | string | See [Titles](#titles). |
-| `start` | string | RFC 3339 timestamp. See [Timestamps](#timestamps). |
-| `end` | string | RFC 3339 timestamp, an instant strictly after `start`. |
+| Field   | Type   | Meaning                                                 |
+| ------- | ------ | ------------------------------------------------------- |
+| `id`    | string | Assigned by the provider. Treat it as an opaque string. |
+| `title` | string | See [Titles](#titles).                                  |
+| `start` | string | RFC 3339 timestamp. See [Timestamps](#timestamps).      |
+| `end`   | string | RFC 3339 timestamp, an instant strictly after `start`.  |
 
 A response contains at least these four fields. A server may add others, and
 clients ignore fields they do not recognize. [Rule 15]
@@ -127,17 +127,17 @@ Every error response has this body:
 
 [Rules 3, 5, 6, 9, 11]
 
-| Situation | Status | `code` |
-| --- | --- | --- |
-| The body is not valid JSON | `400` | `invalid_input` |
-| Valid JSON that breaks a rule: a missing, unknown or wrongly typed field, or a bad value such as a timestamp without an offset or an `end` not after `start` | `422` | `invalid_input` |
-| A bad path or query parameter | `422` | `invalid_input` |
-| `GET`, `PUT` or `DELETE` on an id the calendar does not have | `404` | `not_found` |
-| A `DELETE` repeated after it succeeded | `404` | `not_found` |
-| The configured provider identity lacks permission for the operation | `403` | `access_denied` |
-| The provider returned an invalid or unexpected response | `502` | `provider_error` |
-| A create or replace whose outcome is unknown, such as one that timed out | `502` | `provider_error` |
-| The provider is temporarily unavailable | `503` | `provider_unavailable` |
+| Situation                                                                                                                                                    | Status | `code`                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ---------------------- |
+| The body is not valid JSON                                                                                                                                   | `400`  | `invalid_input`        |
+| Valid JSON that breaks a rule: a missing, unknown or wrongly typed field, or a bad value such as a timestamp without an offset or an `end` not after `start` | `422`  | `invalid_input`        |
+| A bad path or query parameter                                                                                                                                | `422`  | `invalid_input`        |
+| `GET`, `PUT` or `DELETE` on an id the calendar does not have                                                                                                 | `404`  | `not_found`            |
+| A `DELETE` repeated after it succeeded                                                                                                                       | `404`  | `not_found`            |
+| The configured provider identity lacks permission for the operation                                                                                          | `403`  | `access_denied`        |
+| The provider returned an invalid or unexpected response                                                                                                      | `502`  | `provider_error`       |
+| A create or replace whose outcome is unknown, such as one that timed out                                                                                     | `502`  | `provider_error`       |
+| The provider is temporarily unavailable                                                                                                                      | `503`  | `provider_unavailable` |
 
 - These five codes are shared. A server uses another code only for a case
   this contract does not cover, such as `internal_error` for a `500`.
@@ -186,3 +186,23 @@ A create that times out returns no `id`, and listing is not shared, so the
 shared core alone gives a client no way to check whether the event was
 created before it sends the request again. The memo keeps this as an open
 question; a shared listing or an idempotency key on create would close it.
+
+## Verification
+
+`calendar_contract.http_conformance.CalendarHttpConformance` checks this document against a
+running implementation ([how to run it](PYTHON_INTERFACE.md#http-conformance)). It covers:
+
+| Rule in this document                                                                                                                                                                                                | Check                                                                                                                                                                                                       |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Create `201`, get `200`, replace `200` keeping the `id`, delete `204` with no body                                                                                                                                   | `test_create_returns_201_and_shared_event`, `test_get_returns_200_and_created_event`, `test_replace_returns_200_preserves_id_and_persists_values`, `test_delete_returns_204_with_no_body_and_removes_event` |
+| `404 not_found` for a missing event, and for a repeated `DELETE`                                                                                                                                                     | `test_missing_event_returns_not_found`, `test_replace_missing_event_returns_not_found`, `test_repeated_delete_returns_not_found`                                                                            |
+| `422 invalid_input` for valid JSON that breaks a request rule (missing, `null`, non-string or blank title; missing, `null`, offset-less, malformed or numeric timestamps; `end` not after `start`; an unknown field) | `test_create_rejects_valid_json_that_breaks_contract_rules`, `test_replace_rejects_valid_json_that_breaks_contract_rules`                                                                                   |
+| `400 invalid_input` for a body that is not JSON                                                                                                                                                                      | `test_create_rejects_malformed_json`, `test_replace_rejects_malformed_json`                                                                                                                                 |
+| `403 access_denied`, `502 provider_error`, `503 provider_unavailable`                                                                                                                                                | `test_access_denied_uses_shared_http_error`, `test_unexpected_provider_response_uses_shared_http_error`, `test_unavailable_provider_uses_shared_http_error`                                                 |
+| A create or replace with an unknown outcome is `502 provider_error` with `"retryable": false`                                                                                                                        | `test_uncertain_write_is_non_retryable_provider_error`                                                                                                                                                      |
+| Every error body has `code`, `message` and `retryable`                                                                                                                                                               | Every error check above                                                                                                                                                                                     |
+| The four operations work in sequence with the same client code against any server                                                                                                                                    | `test_common_consumer_workflow`                                                                                                                                                                             |
+
+Not checked, because each server chooses them (see [Allowed differences](#allowed-differences)):
+the UTC offset in responses, whether sub-seconds are dropped, the maximum title length,
+whether the stored title is trimmed, the `Location` header, and `Retry-After`.

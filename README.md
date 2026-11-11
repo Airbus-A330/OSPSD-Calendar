@@ -33,8 +33,9 @@ The shared Calendar decision memo keeps the reasoning behind each rule.
 ## Python Interface
 
 `CalendarService` defines the four synchronous operations using the shared
-models and errors. See [the Python interface](docs/PYTHON_INTERFACE.md) for
-imports, failure semantics, consumer usage, and conformance integration.
+models and errors. Reusable Python-service and HTTP conformance suites exercise
+the same four-operation contract. See [the Python interface](docs/PYTHON_INTERFACE.md)
+for imports, failure semantics, consumer usage, fixtures, and cleanup.
 
 ## Optional Extensions
 
@@ -43,17 +44,34 @@ outside the required shared core unless the teams later agree to include them.
 
 ## Repository Scope
 
-This repository will contain:
+This repository contains:
 
-- shared domain and request/response models;
-- shared errors;
-- provider-independent operation interfaces;
-- reusable conformance checks;
-- shared HTTP contract documentation.
+- the shared models: `Event`, `CreateEvent` and `ReplaceEvent`;
+- the shared errors: `CalendarError` with the five `ErrorCode` values;
+- the provider-independent interface, `CalendarService`;
+- two reusable conformance suites, one for the Python interface and one for HTTP;
+- the shared HTTP contract documentation.
 
 Individual service repositories remain responsible for Google Calendar
 integration, authentication, FastAPI or other server implementation,
 configuration, and provider-specific adapters.
+
+## Running the conformance suites against a service
+
+Every implementation in the vertical runs the same two suites from this package, from its
+own repository, against its own code:
+
+| Suite                                                        | Checks                                                                                           | How to run it                                                                     |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| `calendar_contract.conformance.CalendarServiceConformance`   | The Python interface: the four operations and the five shared errors                             | [Python service conformance](docs/PYTHON_INTERFACE.md#python-service-conformance) |
+| `calendar_contract.http_conformance.CalendarHttpConformance` | The HTTP contract: statuses, error bodies, validation, failures and the common consumer workflow | [HTTP conformance](docs/PYTHON_INTERFACE.md#http-conformance)                     |
+
+Each suite is a pytest class: subclass it and supply the fixtures that return your
+implementation and its controlled failing variants. Tests track IDs returned by successful
+creates and attempt to delete those events during fixture teardown. Implementations should use
+an isolated or disposable calendar, because failures before an ID is captured may require
+manual cleanup. Record a run in
+[`docs/CONFORMANCE_RESULTS.md`](docs/CONFORMANCE_RESULTS.md).
 
 ## Installing in a service
 
@@ -101,5 +119,6 @@ uv run mypy src tests
 uv run pytest
 ```
 
-These commands verify formatting, linting, typing, package installation, and the
-initial smoke test without provider credentials or network access at test time.
+These commands verify formatting, linting, typing, package installation, and
+the reusable conformance suites without provider credentials or network access
+at test time.
