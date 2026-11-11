@@ -186,3 +186,23 @@ A create that times out returns no `id`, and listing is not shared, so the
 shared core alone gives a client no way to check whether the event was
 created before it sends the request again. The memo keeps this as an open
 question; a shared listing or an idempotency key on create would close it.
+
+## Verification
+
+`calendar_contract.http_conformance.CalendarHttpConformance` checks this document against a
+running implementation ([how to run it](PYTHON_INTERFACE.md#http-conformance)). It covers:
+
+| Rule in this document | Check |
+| --- | --- |
+| Create `201`, get `200`, replace `200` keeping the `id`, delete `204` with no body | `test_create_returns_201_and_shared_event`, `test_get_returns_200_and_created_event`, `test_replace_returns_200_preserves_id_and_persists_values`, `test_delete_returns_204_with_no_body_and_removes_event` |
+| `404 not_found` for a missing event, and for a repeated `DELETE` | `test_missing_event_returns_not_found`, `test_replace_missing_event_returns_not_found`, `test_repeated_delete_returns_not_found` |
+| `422 invalid_input` for valid JSON that breaks a request rule (missing, `null`, non-string or blank title; missing, `null`, offset-less, malformed or numeric timestamps; `end` not after `start`; an unknown field) | `test_create_rejects_valid_json_that_breaks_contract_rules`, `test_replace_rejects_valid_json_that_breaks_contract_rules` |
+| `400 invalid_input` for a body that is not JSON | `test_create_rejects_malformed_json`, `test_replace_rejects_malformed_json` |
+| `403 access_denied`, `502 provider_error`, `503 provider_unavailable` | `test_access_denied_uses_shared_http_error`, `test_unexpected_provider_response_uses_shared_http_error`, `test_unavailable_provider_uses_shared_http_error` |
+| A create or replace with an unknown outcome is `502 provider_error` with `"retryable": false` | `test_uncertain_write_is_non_retryable_provider_error` |
+| Every error body has `code`, `message` and `retryable` | Every error check above |
+| The four operations work in sequence with the same client code against any server | `test_common_consumer_workflow` |
+
+Not checked, because each server chooses them (see [Allowed differences](#allowed-differences)):
+the UTC offset in responses, whether sub-seconds are dropped, the maximum title length,
+whether the stored title is trimmed, the `Location` header, and `Retry-After`.

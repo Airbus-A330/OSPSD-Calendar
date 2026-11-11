@@ -26,8 +26,11 @@ new version.
 
 1. **Open a release PR.** Set the new `version` in `pyproject.toml`, then run
    `uv lock`: `uv.lock` records the package's own version, so
-   `uv sync --locked` fails until it is updated. List the user-visible changes
+   `uv sync --locked` fails until it is updated. `tests/test_package.py` asserts
+   the version too, so update it in the same PR. List the user-visible changes
    in the PR description, contract changes first.
+   Before a stable (non-candidate) release, every team must have a passing run
+   of both suites recorded in [`CONFORMANCE_RESULTS.md`](CONFORMANCE_RESULTS.md).
 2. **Get it reviewed.** The release PR needs one approval from each of Teams
    2, 5 and 7, none of them from its author, and CI must pass. Every team's
    service will depend on the release, so every team signs off on it.
