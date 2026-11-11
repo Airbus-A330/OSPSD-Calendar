@@ -72,7 +72,7 @@ The caller owns cleanup for events it creates. Timestamp comparisons use
 instants; equivalent output offsets are allowed. Whole-second inputs avoid
 implementation-specific sub-second handling.
 
-## Conformance integration
+## Python service conformance
 
 The suite imports this exact protocol from `calendar_contract.service`.
 Subclass `CalendarServiceConformance` in a test module and provide two
@@ -121,3 +121,62 @@ against the suite's in-memory service does not establish Google integration.
 
 The failure hooks live only in test fixtures. Do not add test-control methods
 to the four-operation production protocol.
+
+## HTTP conformance
+
+`CalendarHttpConformance` verifies the externally observable shared HTTP
+contract for `POST`, `GET`, `PUT`, and `DELETE`. It is framework-neutral: a
+service supplies any synchronous client with the small `HttpClient` shape from
+`calendar_contract.http_conformance`.
+
+Subclass the suite and override two fixtures. `http_client` returns a client for
+an isolated service instance. `failing_http_client` returns a factory that
+accepts the same `ProviderFailure` values used by the Python suite and creates a
+client backed by a controlled failing provider:
+
+```python
+import pytest
+
+from calendar_contract.conformance import ProviderFailure
+from calendar_contract.http_conformance import (
+    CalendarHttpConformance,
+    FailingHttpClientFactory,
+    HttpClient,
+)
+
+
+class TestCalendarHttp(CalendarHttpConformance):
+    @pytest.fixture
+    def http_client(self) -> HttpClient:
+        return make_isolated_http_client()
+
+    @pytest.fixture
+    def failing_http_client(self) -> FailingHttpClientFactory:
+        return lambda failure: make_failing_http_client(failure)
+```
+
+The client must support `request(method, path, json=..., content=...,
+headers=...)`, and its response must expose `status_code`, `content`, and
+`json()`. A framework client such as FastAPI's `TestClient` can be returned
+directly or through a small typed adapter in the consuming repository.
+
+The HTTP suite verifies:
+
+- all four successful operations, status codes, and shared Event fields;
+- a complete create, get, replace, and delete consumer workflow;
+- title, timestamp, time-range, required-field, type, and unknown-field rules;
+- the distinction between malformed JSON (`400`) and valid JSON that violates
+  the contract (`422`);
+- missing get, replace, and delete behavior, including repeated delete;
+- the shared error envelope and controlled provider-failure mappings; and
+- permitted response extensions and equivalent timestamp offsets.
+
+Each test that creates an event records its opaque ID and deletes it during
+fixture teardown. Cleanup accepts `204` and `404`, so a test that already
+deleted its event remains safe. Implementations should still give each test an
+isolated calendar or controlled provider where practical. The normal suite is
+credential-free and network-free; real-provider verification remains the
+responsibility of each service repository.
+
+Recorded cross-team executions and implementation findings are kept in
+[`CONFORMANCE_RESULTS.md`](CONFORMANCE_RESULTS.md).

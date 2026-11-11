@@ -33,8 +33,9 @@ The shared Calendar decision memo keeps the reasoning behind each rule.
 ## Python Interface
 
 `CalendarService` defines the four synchronous operations using the shared
-models and errors. See [the Python interface](docs/PYTHON_INTERFACE.md) for
-imports, failure semantics, consumer usage, and conformance integration.
+models and errors. Reusable Python-service and HTTP conformance suites exercise
+the same four-operation contract. See [the Python interface](docs/PYTHON_INTERFACE.md)
+for imports, failure semantics, consumer usage, fixtures, and cleanup.
 
 ## Optional Extensions
 
@@ -101,5 +102,6 @@ uv run mypy src tests
 uv run pytest
 ```
 
-These commands verify formatting, linting, typing, package installation, and the
-initial smoke test without provider credentials or network access at test time.
+These commands verify formatting, linting, typing, package installation, and
+the reusable conformance suites without provider credentials or network access
+at test time.
