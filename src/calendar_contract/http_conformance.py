@@ -37,6 +37,7 @@ class HttpClient(Protocol):
         self,
         method: str,
         path: str,
+        /,
         *,
         json: object | None = None,
         content: bytes | str | None = None,
@@ -269,15 +270,21 @@ class CalendarHttpConformance:
         )
         _error_body(response, 422, "invalid_input", False)
 
-    @pytest.mark.parametrize(
-        "method,path", (("POST", "/events"), ("PUT", "/events/id"))
-    )
-    def test_write_rejects_malformed_json(
-        self, http_client: HttpClient, method: str, path: str
+    def test_create_rejects_malformed_json(self, http_client: HttpClient) -> None:
+        response = http_client.request(
+            "POST",
+            "/events",
+            content=b'{"title":',
+            headers={"content-type": "application/json"},
+        )
+        _error_body(response, 400, "invalid_input", False)
+
+    def test_replace_rejects_malformed_json(
+        self, http_client: HttpClient, created_event: dict[str, object]
     ) -> None:
         response = http_client.request(
-            method,
-            path,
+            "PUT",
+            f"/events/{created_event['id']}",
             content=b'{"title":',
             headers={"content-type": "application/json"},
         )

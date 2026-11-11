@@ -57,13 +57,15 @@ class ReferenceHttpClient:
     def request(
         self,
         method: str,
-        path: str,
+        url: str,
+        /,
         *,
         json: object | None = None,
         content: bytes | str | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> HttpResponse:
         del headers
+        path = url
         if method in ("POST", "PUT"):
             if content is not None:
                 try:
