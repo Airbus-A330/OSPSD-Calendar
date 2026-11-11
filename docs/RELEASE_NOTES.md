@@ -21,7 +21,7 @@ contract change lands before the tag, the release becomes `v0.2.0` instead.
 - **Public API:** the package root exports exactly `CalendarError`, `CalendarService`,
   `CreateEvent`, `ErrorCode`, `Event` and `ReplaceEvent`, plus `__version__`. The
   accidental `calendar_contract.version` re-export is gone, and module imports stay
-  supported (#25, if merged before the tag).
+  supported (#25).
 - **Docs:** how to run both suites (README), which check covers which HTTP rule
   (`HTTP_CONTRACT.md`), and each team's recorded runs (`CONFORMANCE_RESULTS.md`).
 
