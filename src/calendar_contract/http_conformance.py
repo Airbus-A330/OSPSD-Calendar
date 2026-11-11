@@ -92,7 +92,10 @@ INVALID_BODIES = (
         },
         id="reversed-time-range",
     ),
-    pytest.param({**CREATE_BODY, "location": "Room 101"}, id="unknown-field"),
+    pytest.param(
+        {**CREATE_BODY, "not_a_contract_field": "unexpected"},
+        id="unknown-field",
+    ),
 )
 
 
