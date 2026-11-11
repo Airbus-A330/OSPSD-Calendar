@@ -13,7 +13,7 @@ release candidate commit ([`RELEASING.md`](RELEASING.md)). Update this table wit
 | --- | --- | --- | --- | --- |
 | Team 2 | Nov 9, suite `be8ae2b` | not recorded | 9 passed, 46 failed | No: fixes pending, rerun needed |
 | Team 5 | none | not recorded | not recorded | Not yet recorded |
-| Team 7 | Nov 11, suite `fd4a056` | 37 passed | 55 passed | Yes, with three BASK'D PRs still open (see below) |
+| Team 7 | Nov 11, suite `fd4a056` | 37 passed | 55 passed | Conditional: local run passed; rerun required after the service PRs merge |
 
 ## Team 2
 
@@ -53,20 +53,26 @@ Tested on November 11, 2026, by Karthik Ganeshan:
 - shared suite revision: `fd4a056` (`ms3-submission`);
 - service repository: [samthropic/BASKD](https://github.com/samthropic/BASKD) `main` at
   `f24c312`, merged locally with three open pull requests that make the remaining contract
-  changes: #38 (`a55ae5a`, adopts this package and runs the Python suite), #54 (`31da6db`,
-  `400` for a body that is not JSON) and #56 (`94a7604`, `403 access_denied`);
+  changes: samthropic/BASKD#38 (`a55ae5a`, adopts this package and runs the Python suite),
+  samthropic/BASKD#54 (`31da6db`, `400` for a body that is not JSON) and samthropic/BASKD#56
+  (`94a7604`, `403 access_denied`);
 - execution boundary: BASK'D's FastAPI application through `TestClient`. The success and
   validation checks use its in-memory provider. The failure checks use its real Google
   Calendar adapter over a fake Google SDK, so they go through BASK'D's own error
   translation;
-- credentials and network access: not used. Separately, the integration job in BASK'D #38
-  runs the Python suite's create, get, replace and delete checks against the real Google
-  Calendar;
+- credentials and network access: not used in this run;
 - result: Python suite 37 passed; HTTP suite 55 passed.
+
+Separately, against the real Google Calendar: samthropic/BASKD#38 adds a credential-gated
+integration test that runs the Python suite's create, get, replace and delete checks
+through BASK'D's Google provider. It ran in BASK'D's CI at `aadd50c` (that PR's head on
+Nov 4, with suite `v0.1.0-rc.1`), in the integration job of
+[run 41888897047](https://github.com/samthropic/BASKD/actions/runs/41888897047/job/126780897225):
+16 passed and 14 skipped (the failure checks, which a real calendar cannot produce on
+demand). It has not been rerun against suite `fd4a056`.
 
 Before those three PRs, the HTTP suite found two gaps on BASK'D's `main`: malformed JSON
 returned `422` instead of `400`, and an access denial returned `502` instead of
-`403 access_denied`. Both are fixed by the PRs above. No shared assertions were relaxed. An
+`403 access_denied`. Both are fixed by the BASK'D PRs above. No shared assertions were relaxed. An
 earlier run also found that the suite used `location` as its unknown field, which the
 contract allows as an extension; #24 now uses `not_a_contract_field`.
-

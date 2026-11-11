@@ -67,8 +67,10 @@ own repository, against its own code:
 | `calendar_contract.http_conformance.CalendarHttpConformance` | The HTTP contract: statuses, error bodies, validation, failures and the common consumer workflow | [HTTP conformance](docs/PYTHON_INTERFACE.md#http-conformance) |
 
 Each suite is a pytest class: subclass it and supply the fixtures that return your
-implementation and its controlled failing variants. Each check creates its own events and
-deletes them in fixture teardown, even when the check fails. Record a run in
+implementation and its controlled failing variants. Tests track IDs returned by successful
+creates and attempt to delete those events during fixture teardown. Implementations should use
+an isolated or disposable calendar, because failures before an ID is captured may require
+manual cleanup. Record a run in
 [`docs/CONFORMANCE_RESULTS.md`](docs/CONFORMANCE_RESULTS.md).
 
 ## Installing in a service
